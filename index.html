@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAJ Trucking — Operations Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23ffffff'/%3E%3Cpath d='M3 8h9v7H3z M12 11h4l3 3v1h-7z' fill='none' stroke='%23f25826' stroke-width='1.7'/%3E%3Ccircle cx='6.5' cy='16.5' r='1.4' fill='%23f25826'/%3E%3Ccircle cx='16.5' cy='16.5' r='1.4' fill='%23f25826'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:    #f25826;
+  --accent-dk: #d2461c;
+  --ink:       #333333;
+  --ink-strong:#2b2b2b;
+  --muted:     #6c6c6c;
+  --line:      #e0e0e0;
+  --mist:      #eeeeee;
+  --paper:     #ffffff;
+  --footer:    #2b2b2b;
+  --radius:    12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Roboto',Arial,sans-serif;
+  color:var(--ink);
+  background:var(--mist);
+  min-height:100vh;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header{background:var(--paper);border-bottom:3px solid var(--accent)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:18px 0}
+.brand{display:flex;align-items:center;gap:16px;min-height:52px}
+.brand img{height:48px;width:auto;display:block}
+.brand .fallback{
+  font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:30px;
+  letter-spacing:.02em;text-transform:uppercase;color:var(--ink-strong);line-height:1;display:none;
+}
+.brand .fallback span{color:var(--accent)}
+.brand .tagline{
+  font-family:'Roboto Condensed',sans-serif;font-weight:500;
+  font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin-top:5px;
+}
+.clock{text-align:right;font-family:'Roboto Condensed',sans-serif;line-height:1.15}
+.clock .time{font-size:24px;font-weight:700;color:var(--ink-strong);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.clock .date{font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+section{padding:36px 0 4px}
+.eyebrow{
+  display:flex;align-items:center;gap:14px;
+  font-family:'Roboto Condensed',sans-serif;font-weight:700;
+  font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:18px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+.grid{display:grid;gap:16px}
+.tools{grid-template-columns:repeat(2,1fr)}
+.links{grid-template-columns:repeat(3,1fr)}
+.tile{
+  position:relative;display:flex;gap:16px;align-items:flex-start;
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.tile::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--accent);transform:scaleY(0);transform-origin:top;
+  transition:transform .18s ease;
+}
+.tile:hover{transform:translateY(-3px);border-color:#d9d9d9;box-shadow:0 14px 30px -16px rgba(0,0,0,.32)}
+.tile:hover::before{transform:scaleY(1)}
+.tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ico{
+  flex:none;width:46px;height:46px;border-radius:10px;display:grid;place-items:center;
+  background:#fdece6;border:1px solid #f6cdbd;color:var(--accent);
+}
+.ico svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tile:hover .ico{border-color:var(--accent)}
+.tile .body{min-width:0}
+.tile h3{
+  font-family:'Roboto Condensed',sans-serif;font-weight:700;
+  font-size:20px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-strong);line-height:1.12;
+}
+.tile p{font-size:14px;color:var(--muted);margin-top:5px}
+.tile .go{position:absolute;top:20px;right:20px;color:#c4c4c4;transition:color .15s ease,transform .15s ease}
+.tile:hover .go{color:var(--accent);transform:translate(2px,-2px)}
+.tile .go svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.links .tile{padding:18px}
+.links .ico{width:40px;height:40px}
+.links .ico svg{width:21px;height:21px}
+.links .tile h3{font-size:17px}
+footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
+.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center;padding:26px 0;font-size:13px}
+.foot img{height:34px;width:auto;opacity:.95}
+.foot a{color:#e4e4e4}
+.foot a:hover{color:var(--accent)}
+.foot .motto{font-family:'Roboto Condensed',sans-serif;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#9a9a9a}
+@media(max-width:720px){
+  .tools{grid-template-columns:1fr}
+  .links{grid-template-columns:1fr 1fr}
+  .clock{text-align:left}
+  .bar{align-items:flex-start}
+}
+@media(max-width:480px){ .links{grid-template-columns:1fr} .clock .time{font-size:21px} }
+@media(prefers-reduced-motion:reduce){ *{transition:none!important} .tile:hover{transform:none} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div>
+      <div class="brand">
+        <img src="https://najtrucking.com/wp-content/uploads/naj/logo-header.png"
+             alt="NAJ Trucking, Inc."
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <div class="fallback">NAJ <span>Trucking</span></div>
+      </div>
+      <div class="tagline">Operations Dashboard</div>
+    </div>
+    <div class="clock">
+      <div class="time" id="clock-time">&mdash;</div>
+      <div class="date" id="clock-date">Twinsburg, OH</div>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section>
+    <div class="eyebrow">Tools</div>
+    <div class="grid tools" id="tools-grid"></div>
+  </section>
+  <section>
+    <div class="eyebrow">Resources &amp; Links</div>
+    <div class="grid links" id="links-grid"></div>
+  </section>
+</main>
+<footer>
+  <div class="wrap foot">
+    <img src="https://najtrucking.com/wp-content/uploads/naj/logo-footer.png" alt="NAJ Trucking, Inc."
+         onerror="this.style.display='none'">
+    <div>8530 North Boyle Parkway &middot; Twinsburg, OH 44087 &middot; <a href="tel:+13304054101">330-405-4101</a></div>
+    <div class="motto">Managed by drivers, for drivers</div>
+  </div>
+</footer>
+<script>
+const TOOLS = [
+  { title:"Freight Rate Calculator", desc:"Generate pneumatic freight quotes", url:"https://nloftis722.github.io/NAJ/naj-trucking-calculator.html", icon:"calc",  newTab:false },
+  { title:"CRM",                      desc:"Customer & prospect database",      url:"https://nloftis722.github.io/NAJ/NAJ_CRM_1.html",        icon:"users", newTab:false }
+];
+const LINKS = [
+  { title:"Toro TMS",     desc:"Dispatch & load management", url:"https://app.torotms.com/naj-trucking-inc",                 icon:"truck", newTab:true },
+  { title:"Google Maps",  desc:"Routing & directions",       url:"https://www.google.com/maps",                              icon:"map",   newTab:true },
+  { title:"Ohio Turnpike",desc:"E-ZPass toll rates",         url:"https://www.ohioturnpike.org/e-zpass/toll-rates",          icon:"toll",  newTab:true },
+  { title:"PA Turnpike",  desc:"Toll calculator",            url:"https://www.paturnpike.com/toll-calculator",               icon:"toll",  newTab:true },
+  { title:"WV Turnpike",  desc:"Toll rates & resources",     url:"https://turnpike.wv.gov/traveler-resources/toll-rates",    icon:"toll",  newTab:true }
+];
+const ICONS = {
+  calc:  '<rect x="4" y="2.5" width="16" height="19" rx="2"/><line x1="7.5" y1="6.5" x2="16.5" y2="6.5"/><line x1="7.5" y1="11" x2="8.5" y2="11"/><line x1="11.5" y1="11" x2="12.5" y2="11"/><line x1="15.5" y1="11" x2="16.5" y2="11"/><line x1="7.5" y1="14.5" x2="8.5" y2="14.5"/><line x1="11.5" y1="14.5" x2="12.5" y2="14.5"/><line x1="15.5" y1="14.5" x2="16.5" y2="18"/><line x1="7.5" y1="18" x2="8.5" y2="18"/><line x1="11.5" y1="18" x2="12.5" y2="18"/>',
+  users: '<path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19"/><circle cx="10" cy="8" r="3.2"/><path d="M20 19v-1.4a3.4 3.4 0 0 0-2.6-3.3"/><path d="M15.5 5.2a3.2 3.2 0 0 1 0 5.6"/>',
+  truck: '<path d="M3 6.5h10.5v8.5H3z"/><path d="M13.5 9.5H17l3.5 3.3V15h-7z"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/><line x1="8.7" y1="17.5" x2="15.3" y2="17.5"/>',
+  map:   '<path d="M12 21s6.5-5.5 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 15.5 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.4"/>',
+  toll:  '<path d="M5 20V9l7-4 7 4v11"/><line x1="5" y1="20" x2="19" y2="20"/><line x1="12" y1="5.4" x2="12" y2="20"/><path d="M9 20v-4.5h6V20"/>'
+};
+const ARROW = '<svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="9 7 17 7 17 15"/></svg>';
+function tile(item){
+  const a = document.createElement('a');
+  a.className = 'tile';
+  a.href = item.url;
+  if(item.newTab){ a.target = '_blank'; a.rel = 'noopener'; }
+  a.setAttribute('aria-label', item.title + ' \u2014 ' + item.desc);
+  a.innerHTML =
+    '<span class="ico"><svg viewBox="0 0 24 24">'+(ICONS[item.icon]||'')+'</svg></span>' +
+    '<span class="body"><h3>'+item.title+'</h3><p>'+item.desc+'</p></span>' +
+    '<span class="go">'+ARROW+'</span>';
+  return a;
+}
+function render(list, mountId){
+  const m = document.getElementById(mountId);
+  list.forEach(i => m.appendChild(tile(i)));
+}
+render(TOOLS, 'tools-grid');
+render(LINKS, 'links-grid');
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clock-time').textContent =
+    now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('clock-date').textContent =
+    now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
