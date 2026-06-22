@@ -125,6 +125,30 @@ section{padding:36px 0 4px}
 .wx-day .r.wet{color:#1f6fb8}
 .wx-day .r.dry{color:#3a7d44}
 .wx-msg{padding:12px 14px;font-size:13px;color:var(--muted)}
+/* ---------- KPIs ---------- */
+.kpi{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.kpi-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px 18px}
+.kpi-card h4{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.kpi-days{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi-day{text-align:center;padding:6px 4px;border-radius:9px;background:var(--mist)}
+.kpi-day.today{background:#fdece6;border:1px solid #f6cdbd}
+.kpi-day .lbl{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kpi-day .sub{font-size:10px;color:var(--muted);margin-top:1px}
+.kpi-day .val{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:19px;color:var(--ink-strong);margin-top:5px;font-variant-numeric:tabular-nums}
+.kpi-day.today .val{color:var(--accent-dk)}
+.mi-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.mi-total{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--ink-strong);font-variant-numeric:tabular-nums}
+.mi-total span{font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-left:5px}
+.mi-loadedpct{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:14px;color:#3a7d44}
+.mi-bar{height:14px;border-radius:7px;overflow:hidden;display:flex;background:var(--mist);border:1px solid var(--line)}
+.mi-bar .loaded{background:#3a7d44}
+.mi-bar .empty{background:#d2461c}
+.mi-legend{display:flex;justify-content:space-between;margin-top:8px;font-size:12px}
+.mi-legend .l{color:#3a7d44;font-weight:500}
+.mi-legend .e{color:#d2461c;font-weight:500}
+.mi-legend b{font-family:'Roboto Condensed',sans-serif}
+.kpi-asof{margin-top:10px;font-size:11px;color:var(--muted);font-style:italic}
+@media(max-width:720px){ .kpi{grid-template-columns:1fr} }
 footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
 .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center;padding:26px 0;font-size:13px}
 .foot img{height:34px;width:auto;opacity:.95}
@@ -164,6 +188,29 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
   <section>
     <div class="eyebrow">Weather</div>
     <div class="wx" id="wx"><div class="wx-msg">Loading current conditions&hellip;</div></div>
+  </section>
+  <section>
+    <div class="eyebrow">KPIs</div>
+    <div class="kpi">
+      <div class="kpi-card">
+        <h4>Revenue by Day</h4>
+        <div class="kpi-days" id="kpi-rev"></div>
+        <div class="kpi-asof" id="kpi-asof-rev"></div>
+      </div>
+      <div class="kpi-card">
+        <h4>Empty vs Loaded Miles &middot; Month to Date</h4>
+        <div class="mi-top">
+          <div class="mi-total" id="mi-total"></div>
+          <div class="mi-loadedpct" id="mi-loadedpct"></div>
+        </div>
+        <div class="mi-bar"><div class="loaded" id="mi-bar-loaded"></div><div class="empty" id="mi-bar-empty"></div></div>
+        <div class="mi-legend">
+          <span class="l">Loaded <b id="mi-loaded"></b></span>
+          <span class="e"><b id="mi-empty"></b> Empty</span>
+        </div>
+        <div class="kpi-asof" id="kpi-asof-mi"></div>
+      </div>
+    </div>
   </section>
   <section>
     <div class="eyebrow">Tools</div>
@@ -229,6 +276,54 @@ function updateClock(){
 }
 updateClock();
 setInterval(updateClock, 1000);
+
+/* ============================================================
+   KPIs  (manual snapshot from Toro TMS)
+   ------------------------------------------------------------
+   >>> TO UPDATE: read the numbers in Toro and edit the values
+       in the KPI object below, then commit. <<<
+   - revenue: Booked Order Summary revenue for each day.
+   - milesMTD: Reports > KPIs (month-to-date). totalMiles and
+     emptyPct; loaded miles are derived automatically.
+   - asOf: the date/time you pulled these numbers.
+   ============================================================ */
+const KPI = {
+  asOf: "Mon, Jun 22, 2026, 3:57 PM ET",
+  revenue: {
+    yesterday: { label: "Yesterday", sub: "Jun 21", value: 2800.35 },
+    today:     { label: "Today",     sub: "Jun 22", value: 18158.77 },
+    tomorrow:  { label: "Tomorrow",  sub: "Jun 23", value: 4525.35 }
+  },
+  milesMTD: { totalMiles: 41891, emptyPct: 46.96, period: "Jun 1\u201322" }
+};
+function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+function fmtMiles(n){ return Math.round(n).toLocaleString('en-US') + ' mi'; }
+function renderKPIs(){
+  const r = KPI.revenue;
+  const order = [['yesterday',''],['today','today'],['tomorrow','']];
+  document.getElementById('kpi-rev').innerHTML = order.map(([k,cls]) => {
+    const d = r[k];
+    return '<div class="kpi-day '+cls+'">' +
+      '<div class="lbl">'+d.label+'</div>' +
+      '<div class="sub">'+d.sub+'</div>' +
+      '<div class="val">'+fmtMoney(d.value)+'</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('kpi-asof-rev').textContent = 'As of ' + KPI.asOf;
+
+  const m = KPI.milesMTD;
+  const emptyMiles = Math.round(m.totalMiles * m.emptyPct / 100);
+  const loadedMiles = m.totalMiles - emptyMiles;
+  const loadedPct = 100 - m.emptyPct;
+  document.getElementById('mi-total').innerHTML = fmtMiles(m.totalMiles) + '<span>total</span>';
+  document.getElementById('mi-loadedpct').textContent = loadedPct.toFixed(1) + '% loaded';
+  document.getElementById('mi-bar-loaded').style.width = loadedPct + '%';
+  document.getElementById('mi-bar-empty').style.width = m.emptyPct + '%';
+  document.getElementById('mi-loaded').textContent = fmtMiles(loadedMiles);
+  document.getElementById('mi-empty').textContent = fmtMiles(emptyMiles);
+  document.getElementById('kpi-asof-mi').textContent = m.period + ' \u00b7 as of ' + KPI.asOf;
+}
+renderKPIs();
 
 /* ============================================================
    WEATHER WIDGET  —  Twinsburg, OH
