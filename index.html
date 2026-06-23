@@ -94,37 +94,35 @@ section{padding:36px 0 4px}
 .links .ico{width:40px;height:40px}
 .links .ico svg{width:21px;height:21px}
 .links .tile h3{font-size:17px}
-/* ---------- Weather (compact) ---------- */
+/* ---------- Header weather ---------- */
+.header-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
 .wx{
-  display:flex;align-items:stretch;flex-wrap:wrap;gap:0;
-  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:0 1px 2px rgba(0,0,0,.04);overflow:hidden;
+  display:flex;align-items:stretch;
+  background:var(--mist);border:1px solid var(--line);border-radius:10px;overflow:hidden;
 }
-.wx-head{display:flex;align-items:center;gap:10px;padding:10px 14px;flex:1 1 auto;min-width:240px;border-right:1px solid var(--line)}
-.wx-now-ico{flex:none;width:30px;height:30px;display:grid;place-items:center;color:var(--accent)}
-.wx-now-ico svg{width:26px;height:26px}
-.wx-now-main{display:flex;align-items:baseline;gap:6px}
-.wx-temp{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:22px;line-height:1;color:var(--ink-strong);font-variant-numeric:tabular-nums}
-.wx-cond{font-size:13px;color:var(--ink);font-weight:500}
-.wx-meta{font-size:11px;color:var(--muted);margin-top:1px}
-.wx-loc{margin-left:auto;text-align:right;font-family:'Roboto Condensed',sans-serif;padding-left:8px}
-.wx-loc .l1{font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-strong)}
-.wx-loc .l2{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.wx-rain-flag{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-family:'Roboto Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.wx-head{display:flex;align-items:center;gap:9px;padding:7px 11px;border-right:1px solid var(--line)}
+.wx-now-ico{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--accent)}
+.wx-now-ico svg{width:24px;height:24px}
+.wx-now-main{display:flex;align-items:baseline;gap:5px}
+.wx-temp{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:20px;line-height:1;color:var(--ink-strong);font-variant-numeric:tabular-nums}
+.wx-cond{font-size:12px;color:var(--ink);font-weight:500}
+.wx-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.wx-loc{display:none}
+.wx-rain-flag{display:inline-flex;align-items:center;gap:4px;margin-top:2px;font-family:'Roboto Condensed',sans-serif;font-weight:600;font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:999px}
 .wx-rain-yes{background:#e6f0fb;color:#1f6fb8;border:1px solid #bcd9f2}
 .wx-rain-no{background:#eef6ee;color:#3a7d44;border:1px solid #cfe6cf}
-.wx-days{display:grid;grid-template-columns:repeat(3,minmax(64px,1fr));flex:0 0 auto}
-.wx-day{padding:8px 10px;text-align:center;border-right:1px solid var(--line)}
+.wx-days{display:grid;grid-template-columns:repeat(3,minmax(54px,1fr))}
+.wx-day{padding:6px 9px;text-align:center;border-right:1px solid var(--line)}
 .wx-day:last-child{border-right:none}
-.wx-day .d{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.wx-day .di{height:22px;display:grid;place-items:center;margin:3px 0;color:var(--accent)}
-.wx-day .di svg{width:20px;height:20px}
-.wx-day .t{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--ink-strong)}
-.wx-day .t .lo{color:var(--muted);font-weight:500;margin-left:4px}
-.wx-day .r{font-size:10px;margin-top:2px;font-weight:500}
+.wx-day .d{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wx-day .di{height:18px;display:grid;place-items:center;margin:2px 0;color:var(--accent)}
+.wx-day .di svg{width:17px;height:17px}
+.wx-day .t{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--ink-strong)}
+.wx-day .t .lo{color:var(--muted);font-weight:500;margin-left:3px}
+.wx-day .r{font-size:9px;margin-top:1px;font-weight:500}
 .wx-day .r.wet{color:#1f6fb8}
 .wx-day .r.dry{color:#3a7d44}
-.wx-msg{padding:12px 14px;font-size:13px;color:var(--muted)}
+.wx-msg{padding:8px 12px;font-size:12px;color:var(--muted)}
 /* ---------- KPIs ---------- */
 .kpi{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
 .kpi-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px 18px}
@@ -160,7 +158,8 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
   .links{grid-template-columns:1fr 1fr}
   .clock{text-align:left}
   .bar{align-items:flex-start}
-  .wx-loc{margin-left:0}
+  .header-right{justify-content:flex-start;width:100%}
+  .wx{flex:1 1 auto}
 }
 @media(max-width:480px){ .links{grid-template-columns:1fr} .clock .time{font-size:21px} }
 @media(prefers-reduced-motion:reduce){ *{transition:none!important} .tile:hover{transform:none} }
@@ -178,17 +177,16 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
       </div>
       <div class="tagline">Operations Dashboard</div>
     </div>
-    <div class="clock">
+    <div class="header-right">
+      <div class="clock">
       <div class="time" id="clock-time">&mdash;</div>
       <div class="date" id="clock-date">Twinsburg, OH</div>
+    </div>
+      <div class="wx" id="wx"><div class="wx-msg">Loading current conditions&hellip;</div></div>
     </div>
   </div>
 </header>
 <main class="wrap">
-  <section>
-    <div class="eyebrow">Weather</div>
-    <div class="wx" id="wx"><div class="wx-msg">Loading current conditions&hellip;</div></div>
-  </section>
   <section>
     <div class="eyebrow">KPIs</div>
     <div class="kpi">
