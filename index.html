@@ -80,6 +80,8 @@ section{padding:36px 0 4px}
   background:#fdece6;border:1px solid #f6cdbd;color:var(--accent);
 }
 .ico svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ico.logo{background:#fff;border-color:#e6e6e6}
+.ico img{width:30px;height:30px;object-fit:contain;display:block}
 .tile:hover .ico{border-color:var(--accent)}
 .tile .body{min-width:0}
 .tile h3{
@@ -235,18 +237,18 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
 const TOOLS = [
   { title:"Freight Rate Calculator", desc:"Generate pneumatic freight quotes", url:"https://nloftis722.github.io/NAJ/naj-trucking-calculator.html", icon:"calc",  newTab:false },
   { title:"CRM",                      desc:"Customer & prospect database",      url:"https://nloftis722.github.io/NAJ/NAJ_CRM_1.html",        icon:"users", newTab:false },
-  { title:"Toro TMS",                 desc:"Dispatch & load management",        url:"https://app.torotms.com/naj-trucking-inc",              icon:"truck", newTab:true },
+  { title:"Toro TMS", logo:"torotms.com",                 desc:"Dispatch & load management",        url:"https://app.torotms.com/naj-trucking-inc",              icon:"truck", newTab:true },
   { title:"Carry-All Schedule", desc:"Trimor carry-all trip scheduling", url:"https://triptools.trimor.com/Trucking/CarryAllSchedule", icon:"schedule", newTab:true }
 ];
 const LINKS = [
-  { title:"Google Maps",  desc:"Routing & directions",       url:"https://www.google.com/maps",                              icon:"map",   newTab:true },
-  { title:"Ohio Turnpike",desc:"E-ZPass toll rates",         url:"https://www.ohioturnpike.org/e-zpass/toll-rates",          icon:"toll",  newTab:true },
-  { title:"PA Turnpike",  desc:"Toll calculator",            url:"https://www.paturnpike.com/toll-calculator",               icon:"toll",  newTab:true },
-  { title:"WV Turnpike",  desc:"Toll rates & resources",     url:"https://turnpike.wv.gov/traveler-resources/toll-rates",    icon:"toll",  newTab:true }
+  { title:"Google Maps", logo:"google.com",  desc:"Routing & directions",       url:"https://www.google.com/maps",                              icon:"map",   newTab:true },
+  { title:"Ohio Turnpike", logo:"ohioturnpike.org",desc:"E-ZPass toll rates",         url:"https://www.ohioturnpike.org/e-zpass/toll-rates",          icon:"toll",  newTab:true },
+  { title:"PA Turnpike", logo:"paturnpike.com",  desc:"Toll calculator",            url:"https://www.paturnpike.com/toll-calculator",               icon:"toll",  newTab:true },
+  { title:"WV Turnpike", logo:"turnpike.wv.gov",  desc:"Toll rates & resources",     url:"https://turnpike.wv.gov/traveler-resources/toll-rates",    icon:"toll",  newTab:true }
 ];
 const LOADBOARDS = [
-  { title:"DAT One", desc:"DAT load board login", url:"https://login.dat.com/", icon:"map", newTab:true },
-  { title:"TruckSmarter", desc:"TruckSmarter load board", url:"https://app.trucksmarter.com/loadboard/new", icon:"map", newTab:true }
+  { title:"DAT One", logo:"dat.com", desc:"DAT load board login", url:"https://login.dat.com/", icon:"map", newTab:true },
+  { title:"TruckSmarter", logo:"trucksmarter.com", desc:"TruckSmarter load board", url:"https://app.trucksmarter.com/loadboard/new", icon:"map", newTab:true }
 ];
 const ICONS = {
   calc:  '<rect x="4" y="2.5" width="16" height="19" rx="2"/><line x1="7.5" y1="6.5" x2="16.5" y2="6.5"/><line x1="7.5" y1="11" x2="8.5" y2="11"/><line x1="11.5" y1="11" x2="12.5" y2="11"/><line x1="15.5" y1="11" x2="16.5" y2="11"/><line x1="7.5" y1="14.5" x2="8.5" y2="14.5"/><line x1="11.5" y1="14.5" x2="12.5" y2="14.5"/><line x1="15.5" y1="14.5" x2="16.5" y2="18"/><line x1="7.5" y1="18" x2="8.5" y2="18"/><line x1="11.5" y1="18" x2="12.5" y2="18"/>',
@@ -257,6 +259,16 @@ const ICONS = {
   toll:  '<path d="M5 20V9l7-4 7 4v11"/><line x1="5" y1="20" x2="19" y2="20"/><line x1="12" y1="5.4" x2="12" y2="20"/><path d="M9 20v-4.5h6V20"/>'
 };
 const ARROW = '<svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="9 7 17 7 17 15"/></svg>';
+function iconHtml(item){
+  var svg='<span class="ico"><svg viewBox="0 0 24 24">'+(ICONS[item.icon]||'')+'</svg></span>';
+  if(item.logo){
+    var src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(item.logo)+'&sz=64';
+    var fb='<span class="ico fb" style="display:none"><svg viewBox="0 0 24 24">'+(ICONS[item.icon]||'')+'</svg></span>';
+    var img='<span class="ico logo"><img src="'+src+'" alt="" onerror="this.closest(&#39;a&#39;).querySelector(&#39;.fb&#39;).style.display=&#39;grid&#39;;this.closest(&#39;.ico&#39;).remove()"></span>';
+    return img+fb;
+  }
+  return svg;
+}
 function tile(item){
   const a = document.createElement('a');
   a.className = 'tile';
@@ -264,7 +276,7 @@ function tile(item){
   if(item.newTab){ a.target = '_blank'; a.rel = 'noopener'; }
   a.setAttribute('aria-label', item.title + ' \u2014 ' + item.desc);
   a.innerHTML =
-    '<span class="ico"><svg viewBox="0 0 24 24">'+(ICONS[item.icon]||'')+'</svg></span>' +
+    iconHtml(item) +
     '<span class="body"><h3>'+item.title+'</h3><p>'+item.desc+'</p></span>' +
     '<span class="go">'+ARROW+'</span>';
   return a;
