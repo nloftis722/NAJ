@@ -165,6 +165,19 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
 }
 @media(max-width:480px){ .links{grid-template-columns:1fr} .clock .time{font-size:21px} }
 @media(prefers-reduced-motion:reduce){ *{transition:none!important} .tile:hover{transform:none} }
+
+.tile.folder{cursor:pointer;flex-wrap:wrap}
+.tile.folder .chev{font-size:13px;transition:transform .18s ease}
+.tile.folder.open .chev{transform:rotate(180deg)}
+.folder-list{display:none;flex-basis:100%;width:100%;margin-top:12px;border-top:1px solid var(--mist);padding-top:6px}
+.tile.folder.open .folder-list{display:block}
+.folder-list a{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 6px;border-radius:8px;text-decoration:none;color:inherit}
+.folder-list a:hover{background:var(--mist)}
+.folder-list a b{font-size:14px;color:var(--ink-strong)}
+.folder-list a small{color:var(--muted);font-size:12px;text-align:right}
+.mi-row{margin-bottom:14px}
+.mi-row:last-child{margin-bottom:0}
+.mi-row .rowlbl{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -198,17 +211,9 @@ footer{margin-top:46px;background:var(--footer);color:#cfcfcf}
         <div class="kpi-asof" id="kpi-asof-rev"></div>
       </div>
       <div class="kpi-card">
-        <h4>Empty vs Loaded Miles &middot; Month to Date</h4>
-        <div class="mi-top">
-          <div class="mi-total" id="mi-total"></div>
-          <div class="mi-loadedpct" id="mi-loadedpct"></div>
-        </div>
-        <div class="mi-bar"><div class="loaded" id="mi-bar-loaded"></div><div class="empty" id="mi-bar-empty"></div></div>
-        <div class="mi-legend">
-          <span class="l">Loaded <b id="mi-loaded"></b></span>
-          <span class="e"><b id="mi-empty"></b> Empty</span>
-        </div>
-        <div class="kpi-asof" id="kpi-asof-mi"></div>
+        <h4>Empty vs Loaded Miles</h4>
+          <div id="mi-rows"></div>
+          <div class="kpi-asof" id="kpi-asof-mi"></div>
       </div>
     </div>
   </section>
@@ -242,9 +247,12 @@ const TOOLS = [
 ];
 const LINKS = [
   { title:"Google Maps", logo:"google.com",  desc:"Routing & directions",       url:"https://www.google.com/maps",                              icon:"map",   newTab:true },
-  { title:"Ohio Turnpike", logo:"ohioturnpike.org",desc:"E-ZPass toll rates",         url:"https://www.ohioturnpike.org/e-zpass/toll-rates",          icon:"toll",  newTab:true },
-  { title:"PA Turnpike", logo:"paturnpike.com",  desc:"Toll calculator",            url:"https://www.paturnpike.com/toll-calculator",               icon:"toll",  newTab:true },
-  { title:"WV Turnpike", logo:"turnpike.wv.gov",  desc:"Toll rates & resources",     url:"https://turnpike.wv.gov/traveler-resources/toll-rates",    icon:"toll",  newTab:true }
+  { title:"Tolls", desc:"OH · PA · WV turnpike toll rates", icon:"toll",
+    folder:[
+      { title:"Ohio Turnpike", desc:"E-ZPass toll rates",     url:"https://www.ohioturnpike.org/e-zpass/toll-rates" },
+      { title:"PA Turnpike",   desc:"Toll calculator",        url:"https://www.paturnpike.com/toll-calculator" },
+      { title:"WV Turnpike",   desc:"Toll rates & resources", url:"https://turnpike.wv.gov/traveler-resources/toll-rates" }
+    ] }
 ];
 const LOADBOARDS = [
   { title:"DAT One", logo:"dat.com", desc:"DAT load board login", url:"https://login.dat.com/", icon:"map", newTab:true },
@@ -269,11 +277,26 @@ function iconHtml(item){
   }
   return svg;
 }
+function folderTile(item){
+  var w=document.createElement('div');
+  w.className='tile folder';
+  w.setAttribute('role','button'); w.setAttribute('tabindex','0');
+  w.setAttribute('aria-label', item.title+' — '+item.desc);
+  var list=item.folder.map(function(f){
+    return "<a href='"+f.url+"' target='_blank' rel='noopener'><b>"+f.title+"</b><small>"+f.desc+"</small></a>";
+  }).join('');
+  w.innerHTML = iconHtml(item) + "<span class='body'><h3>"+item.title+"</h3><p>"+item.desc+"</p></span><span class='go chev'>▾</span><div class='folder-list'>"+list+"</div>";
+  function tog(){ w.classList.toggle('open'); }
+  w.addEventListener('click',function(e){ if(e.target.closest('a')) return; tog(); });
+  w.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(); }});
+  return w;
+}
 function tile(item){
+  if(item.folder){ return folderTile(item); }
   const a = document.createElement('a');
   a.className = 'tile';
   a.href = item.url;
-  if(item.newTab){ a.target = '_blank'; a.rel = 'noopener'; }
+  a.target="_blank"; a.rel="noopener";
   a.setAttribute('aria-label', item.title + ' \u2014 ' + item.desc);
   a.innerHTML =
     iconHtml(item) +
@@ -309,13 +332,16 @@ setInterval(updateClock, 1000);
    - asOf: the date/time you pulled these numbers.
    ============================================================ */
 const KPI = {
-  asOf: "Tue, Jun 23, 2026, 8:58 AM ET",
+  asOf: "Thu, Jul 9, 2026, 9:19 AM ET",
   revenue: {
     yesterday: { label: "Yesterday", sub: "Jun 22", value: 19443.10 },
     today:     { label: "Today",     sub: "Jun 23", value: 8627.02 },
     tomorrow:  { label: "Tomorrow",  sub: "Jun 24", value: 2500.00 }
   },
-  milesMTD: { totalMiles: 41891, emptyPct: 46.96, period: "Jun 1\u201323" }
+  miles:[
+    { label:"June 2026", period:"Jun 1–30", totalMiles: 81265, emptyPct: 47.19 },
+    { label:"July MTD",  period:"Jul 1–9",  totalMiles: 6032,  emptyPct: 46.64 }
+  ]
 };
 function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
 function fmtMiles(n){ return Math.round(n).toLocaleString('en-US') + ' mi'; }
@@ -332,17 +358,18 @@ function renderKPIs(){
   }).join('');
   document.getElementById('kpi-asof-rev').textContent = 'As of ' + KPI.asOf;
 
-  const m = KPI.milesMTD;
-  const emptyMiles = Math.round(m.totalMiles * m.emptyPct / 100);
-  const loadedMiles = m.totalMiles - emptyMiles;
-  const loadedPct = 100 - m.emptyPct;
-  document.getElementById('mi-total').innerHTML = fmtMiles(m.totalMiles) + '<span>total</span>';
-  document.getElementById('mi-loadedpct').textContent = loadedPct.toFixed(1) + '% loaded';
-  document.getElementById('mi-bar-loaded').style.width = loadedPct + '%';
-  document.getElementById('mi-bar-empty').style.width = m.emptyPct + '%';
-  document.getElementById('mi-loaded').textContent = fmtMiles(loadedMiles);
-  document.getElementById('mi-empty').textContent = fmtMiles(emptyMiles);
-  document.getElementById('kpi-asof-mi').textContent = m.period + ' \u00b7 as of ' + KPI.asOf;
+  document.getElementById('mi-rows').innerHTML = KPI.miles.map(function(m){
+    var emptyMiles = Math.round(m.totalMiles*m.emptyPct/100);
+    var loadedMiles = m.totalMiles - emptyMiles;
+    var loadedPct = 100 - m.emptyPct;
+    return "<div class='mi-row'>"
+      +"<div class='rowlbl'>"+m.label+" ("+m.period+")</div>"
+      +"<div class='mi-top'><div class='mi-total'>"+fmtMiles(m.totalMiles)+" <span>total</span></div><div class='mi-loadedpct'>"+loadedPct.toFixed(1)+"% loaded</div></div>"
+      +"<div class='mi-bar'><div class='loaded' style='width:"+loadedPct+"%'></div><div class='empty' style='width:"+m.emptyPct+"%'></div></div>"
+      +"<div class='mi-legend'><span class='l'>Loaded <b>"+fmtMiles(loadedMiles)+"</b></span><span class='e'><b>"+fmtMiles(emptyMiles)+"</b> Empty</span></div>"
+      +"</div>";
+  }).join('');
+  document.getElementById('kpi-asof-mi').textContent = 'As of ' + KPI.asOf;
 }
 renderKPIs();
 
